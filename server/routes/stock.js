@@ -2,11 +2,11 @@ import express from 'express';
 import fetch from 'node-fetch';
 
 const router = express.Router();
-const JUHE_API_KEY = process.env.JUHE_API_KEY;
 const JUHE_BASE_URL = 'http://web.juhe.cn/finance/stock/hs';
 
-if (!JUHE_API_KEY) {
-  console.error('[Juhe Data] 未配置 JUHE_API_KEY 环境变量');
+// 动态获取环境变量，避免模块加载时机问题
+function getJuheApiKey() {
+  return process.env.JUHE_API_KEY;
 }
 
 router.post('/:symbol', async (req, res) => {
@@ -19,7 +19,7 @@ router.post('/:symbol', async (req, res) => {
     }
 
     // 优先使用前端传递的 API Key，其次使用环境变量
-    const effectiveApiKey = apiKey || JUHE_API_KEY;
+    const effectiveApiKey = apiKey || getJuheApiKey();
 
     if (!effectiveApiKey) {
       return res.status(500).json({

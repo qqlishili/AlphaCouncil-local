@@ -2,10 +2,10 @@ import express from 'express';
 import fetch from 'node-fetch';
 
 const router = express.Router();
-const QWEN_API_KEY = process.env.QWEN_API_KEY;
 
-if (!QWEN_API_KEY) {
-  console.error('[Qwen] 未配置 QWEN_API_KEY 环境变量');
+// 动态获取环境变量，避免模块加载时机问题
+function getQwenApiKey() {
+  return process.env.QWEN_API_KEY;
 }
 
 router.post('/', async (req, res) => {
@@ -13,7 +13,7 @@ router.post('/', async (req, res) => {
     const { model, systemPrompt, prompt, temperature, apiKey } = req.body;
 
     // 优先使用前端传递的 API Key，其次使用环境变量
-    const effectiveApiKey = apiKey || QWEN_API_KEY;
+    const effectiveApiKey = apiKey || getQwenApiKey();
 
     if (!effectiveApiKey) {
       return res.status(400).json({

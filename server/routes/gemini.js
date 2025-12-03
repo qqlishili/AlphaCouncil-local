@@ -2,10 +2,10 @@ import express from 'express';
 import { GoogleGenAI } from '@google/genai';
 
 const router = express.Router();
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-if (!GEMINI_API_KEY) {
-  console.error('[Gemini] 未配置 GEMINI_API_KEY 环境变量');
+// 动态获取环境变量，避免模块加载时机问题
+function getGeminiApiKey() {
+  return process.env.GEMINI_API_KEY;
 }
 
 router.post('/', async (req, res) => {
@@ -13,7 +13,7 @@ router.post('/', async (req, res) => {
     const { model, prompt, temperature, tools, apiKey } = req.body;
 
     // 优先使用前端传递的 API Key，其次使用环境变量
-    const effectiveApiKey = apiKey || GEMINI_API_KEY;
+    const effectiveApiKey = apiKey || getGeminiApiKey();
 
     if (!effectiveApiKey) {
       return res.status(500).json({
